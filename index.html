@@ -553,7 +553,7 @@ if ('serviceWorker' in navigator) {
     </div>
 
     <div style="margin-top:auto; padding-top:30px; text-align:center;">
-      <div style="font-size:11px; color:var(--text2);">Envios para <span style="color:var(--accent)">nellsantos@outlook.com</span></div>
+      <div style="font-size:11px; color:var(--text2);"><span style="color:var(--accent)"></span></div>
     </div>
   </div>
 </div>
@@ -717,7 +717,7 @@ if ('serviceWorker' in navigator) {
     <div class="modal-handle"></div>
     <div class="modal-title" id="modal-title">Confirmar Envio</div>
     <div style="font-size:13px; color:var(--text); margin-bottom:16px;" id="modal-desc">
-      Os dados serão enviados para <strong>nellsantos@outlook.com</strong>
+      <strong></strong>
     </div>
 
     <div class="input-group">
@@ -762,6 +762,7 @@ const EMAILJS_PUBLIC_KEY  = 'DE1bLG1OctStk_vF8';
 const EMAILJS_SERVICE_ID  = 'service_q6j3j13';
 const EMAILJS_TEMPLATE_ID = 'template_fa5k7oj';
 const EMAIL_DESTINO       = 'nellsantos@outlook.com';
+const LOJA = "O Bom Pet - Vargem Grande";
 
 emailjs.init(EMAILJS_PUBLIC_KEY);
 
@@ -996,8 +997,8 @@ function openConfirmModal(type) {
   } else {
     const keys = Object.keys(cart);
     if (!keys.length) { showToast('Adicione ao menos um produto', 'error'); return; }
-    document.getElementById('modal-title').textContent = '🌾 Confirmar Lançamento Granel';
-    document.getElementById('modal-desc').innerHTML = `Os dados serão enviados para <strong>${EMAIL_DESTINO}</strong>`;
+    document.getElementById('modal-title').textContent = 'Confirmar Lançamento Granel';
+    document.getElementById('modal-desc').innerHTML = ` <strong>${EMAIL_DESTINO}</strong>`;
     document.getElementById('confirm-send-btn').innerHTML = '✉️ Enviar Granel';
     let summary = `<b>Total de itens:</b> ${keys.length}<br><br>`;
     summary += keys.map(k => `▸ ${cart[k].name || cart[k].code} — <b>${cart[k].qty}x</b>`).join('<br>');
@@ -1041,7 +1042,7 @@ async function sendData() {
       if (d || v) vencText += `\n  Parcela ${i+1}: ${formatDate(d)} — R$ ${v}`;
     });
 
-    subject = `[Nota Fiscal] NF ${numero} — ${tipoText} — Resp: ${responsavel}`;
+    subject = `[Nota Fiscal-APP] Nota Recebida`;
     body = `LANÇAMENTO DE NOTA FISCAL
 ${'='.repeat(40)}
 
@@ -1061,7 +1062,7 @@ Enviado via App Leitor de Produtos`;
 
   } else {
     const items = Object.values(cart);
-    subject = `[Granel] Lançamento de ${items.length} produto(s) — Resp: ${responsavel}`;
+    subject = `[Granel-APP] Lançamento`;
     body = `LANÇAMENTO GRANEL
 ${'='.repeat(40)}
 
@@ -1100,7 +1101,7 @@ let htmlEmail = `
   <div style="max-width:700px;margin:auto;background:#ffffff;border-radius:10px;padding:25px;border:1px solid #ddd;">
 
     <h2 style="color:#00d4aa;margin-top:0;">
-      ${currentModal === 'nf' ? '🧾 Lançamento de Nota Fiscal' : '🌾 Lançamento Granel'}
+      ${currentModal === 'nf' ? 'Lançamento de Nota Fiscal' : 'Lançamento Granel'}
     </h2>
 
     <p>
@@ -1110,52 +1111,122 @@ let htmlEmail = `
 
     <hr>
 
-    ${currentModal === 'nf' ? `
+    ${
+      currentModal === 'nf'
+      ?
+      `
       <table style="width:100%;border-collapse:collapse;">
         <tr>
           <td style="padding:8px;border:1px solid #ddd;"><strong>Número NF</strong></td>
           <td style="padding:8px;border:1px solid #ddd;">${numero}</td>
         </tr>
+
         <tr>
           <td style="padding:8px;border:1px solid #ddd;"><strong>Tipo</strong></td>
           <td style="padding:8px;border:1px solid #ddd;">${tipoText}</td>
         </tr>
+
         <tr>
           <td style="padding:8px;border:1px solid #ddd;"><strong>Valor Total</strong></td>
           <td style="padding:8px;border:1px solid #ddd;">R$ ${valor}</td>
         </tr>
+
         <tr>
           <td style="padding:8px;border:1px solid #ddd;"><strong>Chave</strong></td>
-          <td style="padding:8px;border:1px solid #ddd;">${chave || 'Não informada'}</td>
+          <td style="padding:8px;border:1px solid #ddd;word-break:break-all;">
+            ${chave || 'Não informada'}
+          </td>
         </tr>
       </table>
 
-      ${obs ? `
-      <h3>Observações</h3>
-      <div style="background:#f8f8f8;padding:10px;border-radius:6px;">
-        ${obs}
-      </div>` : ''}
-    ` : `
+      ${
+        obs
+        ?
+        `
+        <h3>Observações</h3>
+        <div style="background:#f8f8f8;padding:10px;border-radius:6px;">
+          ${obs}
+        </div>
+        `
+        :
+        ''
+      }
+
+      ${
+Array.from(document.querySelectorAll('.venc-row')).some(row =>
+    row.querySelector('.venc-data').value ||
+    row.querySelector('.venc-valor').value
+)
+?
+`
+<h3 style="margin-top:20px;">Vencimentos</h3>
+
+<table style="width:100%;border-collapse:collapse;">
+  <tr style="background:#f2f2f2;">
+    <th style="padding:8px;border:1px solid #ddd;">Parcela</th>
+    <th style="padding:8px;border:1px solid #ddd;">Data</th>
+    <th style="padding:8px;border:1px solid #ddd;">Valor</th>
+  </tr>
+
+  ${Array.from(document.querySelectorAll('.venc-row'))
+    .filter(row =>
+      row.querySelector('.venc-data').value ||
+      row.querySelector('.venc-valor').value
+    )
+    .map((row,i)=>`
+      <tr>
+        <td style="padding:8px;border:1px solid #ddd;text-align:center;">
+          ${i+1}
+        </td>
+
+        <td style="padding:8px;border:1px solid #ddd;">
+          ${formatDate(row.querySelector('.venc-data').value)}
+        </td>
+
+        <td style="padding:8px;border:1px solid #ddd;">
+          R$ ${row.querySelector('.venc-valor').value || '0,00'}
+        </td>
+      </tr>
+    `).join('')}
+</table>
+`
+:
+''
+}
+
+      <br>
+
+      <div style="background:#f2f2f2;border:1px solid #ddd;padding:12px;">
+        <strong>Valor Total da Nota:</strong> R$ ${valor}
+      </div>
+      `
+      :
+      `
       <table style="width:100%;border-collapse:collapse;">
-        <tr style="background:#f8f8f8;">
+        <tr style="background:#f2f2f2;">
           <th style="padding:8px;border:1px solid #ddd;">Produto</th>
           <th style="padding:8px;border:1px solid #ddd;">Código</th>
           <th style="padding:8px;border:1px solid #ddd;">Qtd</th>
         </tr>
 
-        ${Object.values(cart).map(p => `
-        <tr>
-          <td style="padding:8px;border:1px solid #ddd;">${p.name}</td>
-          <td style="padding:8px;border:1px solid #ddd;">${p.code}</td>
-          <td style="padding:8px;border:1px solid #ddd;text-align:center;">${p.qty}</td>
-        </tr>
+        ${Object.values(cart).map(item=>`
+          <tr>
+            <td style="padding:8px;border:1px solid #ddd;">${item.name}</td>
+            <td style="padding:8px;border:1px solid #ddd;">${item.code}</td>
+            <td style="padding:8px;border:1px solid #ddd;text-align:center;">
+              ${item.qty}
+            </td>
+          </tr>
         `).join('')}
       </table>
-    `}
 
-    <div style="margin-top:20px;padding-top:15px;border-top:1px solid #ddd;color:#666;font-size:12px;">
-      Enviado via App Leitor de Produtos
-    </div>
+      <br>
+
+      <div style="background:#f2f2f2;border:1px solid #ddd;padding:12px;">
+        <strong>Total de Produtos:</strong> ${Object.keys(cart).length}
+      </div>
+      `
+    }
 
   </div>
 </div>
@@ -1170,7 +1241,8 @@ try {
             to_email: EMAIL_DESTINO,
             subject: subject,
             message: body,
-            html_content: htmlEmail
+            html_content: htmlEmail,
+            loja: LOJA
         }
     );
 
