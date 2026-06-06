@@ -10,7 +10,6 @@
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#4CAF50">
 <link rel="icon" href="icon-192.png">
-<link rel="icon" href="icon-512.png">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <style>
@@ -594,13 +593,6 @@ if ('serviceWorker' in navigator) {
       </div>
     </div>
 
-    <!-- Fornecedor -->
-    <div class="section-label">Fornecedor</div>
-    <div class="input-group">
-      <label>Nome do Fornecedor *</label>
-      <input type="text" id="nf-fornecedor" placeholder="Ex: Distribuidora XYZ...">
-    </div>
-
     <!-- Tipo de nota -->
     <div class="section-label">Tipo de Nota</div>
     <div class="input-group">
@@ -978,8 +970,6 @@ function openConfirmModal(type) {
     const valor  = document.getElementById('nf-valor').value;
     if (!numero) { showToast('Informe o número da nota', 'error'); return; }
     if (!valor)  { showToast('Informe o valor total', 'error'); return; }
-    const fornecedor = document.getElementById('nf-fornecedor').value.trim();
-    if (!fornecedor) { showToast('Informe o fornecedor', 'error'); return; }
 
     document.getElementById('modal-title').textContent = '🧾 Confirmar Envio — Nota Fiscal';
     document.getElementById('modal-desc').innerHTML = `Os dados serão enviados para <strong>${EMAIL_DESTINO}</strong>`;
@@ -993,7 +983,7 @@ function openConfirmModal(type) {
       if (d || v) vencimentos.push({ data: d, valor: v });
     });
 
-    let summary = `<b>Fornecedor:</b> ${fornecedor}<br><b>NF Nº:</b> ${numero}<br><b>Tipo:</b> ${tipo.options[tipo.selectedIndex].text}<br><b>Valor Total:</b> R$ ${valor}`;
+    let summary = `<b>NF Nº:</b> ${numero}<br><b>Tipo:</b> ${tipo.options[tipo.selectedIndex].text}<br><b>Valor Total:</b> R$ ${valor}`;
     const key = document.getElementById('nf-key').value;
     if (key) summary += `<br><b>Chave:</b> ${key.substring(0,20)}...`;
     const obs = document.getElementById('nf-obs').value;
@@ -1043,7 +1033,6 @@ async function sendData() {
     const tipoText = tipo.options[tipo.selectedIndex].text;
     const chave    = document.getElementById('nf-key').value;
     const obs      = document.getElementById('nf-obs').value;
-    const fornecedor = document.getElementById('nf-fornecedor').value.trim();
 
     const vencRows = document.querySelectorAll('.venc-row');
     let vencText = '';
@@ -1061,7 +1050,6 @@ Responsável: ${responsavel}
 Data/Hora: ${new Date().toLocaleString('pt-BR')}
 
 DADOS DA NOTA:
-  Fornecedor: ${fornecedor}
   Número: ${numero}
   Tipo: ${tipoText}
   Valor Total: R$ ${valor}
@@ -1128,10 +1116,6 @@ let htmlEmail = `
       ?
       `
       <table style="width:100%;border-collapse:collapse;">
-        <tr>
-          <td style="padding:8px;border:1px solid #ddd;"><strong>Fornecedor</strong></td>
-          <td style="padding:8px;border:1px solid #ddd;">${fornecedor}</td>
-        </tr>
         <tr>
           <td style="padding:8px;border:1px solid #ddd;"><strong>Número NF</strong></td>
           <td style="padding:8px;border:1px solid #ddd;">${numero}</td>
@@ -1272,7 +1256,6 @@ try {
         document.getElementById('nf-valor').value = '';
         document.getElementById('nf-tipo').value = '';
         document.getElementById('nf-obs').value = '';
-        document.getElementById('nf-fornecedor').value = '';
 
     } else {
 
