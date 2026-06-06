@@ -1095,8 +1095,12 @@ let valor = '';
 let tipoText = '';
 let chave = '';
 let obs = '';
+let fornecedor = '';
 
 if (currentModal === 'nf') {
+
+    fornecedor = document.getElementById('nf-fornecedor').value.trim();
+
     numero = document.getElementById('nf-numero').value;
     valor = document.getElementById('nf-valor').value;
 
